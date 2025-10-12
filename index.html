@@ -12,8 +12,8 @@
   <style>
     body {
       font-family: 'Noto Sans Hebrew', 'Calibri', sans-serif;
-      background-color: #f2f2f2;
-      color: #222;
+      background-color: #808080; /* אפור כהה יותר */
+      color: #f5f5f5;
       text-align: center;
       font-size: 28px;
       direction: rtl;
@@ -36,8 +36,8 @@
     }
 
     img {
-      margin-top: 30px;
-      width: 100px;
+      margin-top: 60px; /* טיפה יותר למטה */
+      width: 200px; /* פי 2 מגודל קודם */
       cursor: pointer;
       transition: transform 0.2s ease;
     }
@@ -50,8 +50,14 @@
       display: none;
     }
 
+    #word {
+      font-size: 60px; /* גדול יותר */
+      color: white; /* לבן במשימה עצמה */
+    }
+
     #plus {
-      font-size: 50px;
+      font-size: 60px; /* גדול גם לסימן + */
+      color: white;
     }
 
     h2 {
@@ -63,7 +69,7 @@
     }
 
     #message {
-      color: #b30000;
+      color: #ffcccc;
       font-size: 22px;
     }
   </style>
@@ -143,7 +149,7 @@
         const docSnap = await ref.get();
 
         if (docSnap.exists) {
-            message.innerText = "נראה שכבר השתתפת בניסוי. תודה!";
+            message.innerText = "נראה שכבר ביצעת את השלב הזה בעבר ואין אפשרות לבצע אותו שוב.";
         } else {
             await ref.set({ entered: true, timestamp: new Date() });
             document.getElementById("participant-screen").style.display = "none";
