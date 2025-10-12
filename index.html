@@ -12,7 +12,7 @@
   <style>
     body {
       font-family: 'Noto Sans Hebrew', 'Calibri', sans-serif;
-      background-color: #808080; /* אפור כהה יותר */
+      background-color: #808080; /* אפור כהה */
       color: #f5f5f5;
       text-align: center;
       font-size: 28px;
@@ -51,12 +51,12 @@
     }
 
     #word {
-      font-size: 60px; /* גדול יותר */
-      color: white; /* לבן במשימה עצמה */
+      font-size: 60px;
+      color: white;
     }
 
     #plus {
-      font-size: 60px; /* גדול גם לסימן + */
+      font-size: 60px;
       color: white;
     }
 
@@ -69,8 +69,9 @@
     }
 
     #message {
-      color: #ffcccc;
+      color: red; /* ✅ אדום ברור לשגיאה */
       font-size: 22px;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -159,10 +160,21 @@
 
     // תחילת הניסוי
     async function startExperiment() {
+        // ✅ מעבר למסך מלא
+        if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
+        }
+
         document.getElementById("instructions").style.display = "none";
         const randomizedWords = shuffle([...words]);
         await showWords(randomizedWords);
-        document.body.innerHTML = "<h2>תודה! סיום שלב הקידוד.</h2>";
+
+        // ✅ טקסט סיום חדש בשלוש שורות
+        document.body.innerHTML = `
+          <h2>שלב זה הסתיים.</h2>
+          <p>יש לצאת מהאתר הזה ולגשת ללינק הבא כדי לבצע את משימת הזיכרון</p>
+          <p>תודה!</p>
+        `;
     }
 
     // הצגת מילים
