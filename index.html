@@ -1,54 +1,101 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <title>ניסוי זיכרון - לוטם</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: black;
-            color: white;
-            text-align: center;
-            font-size: 32px;
-            direction: rtl;
-        }
-        #word, #plus, #instructions, #participant-screen {
-            display: none;
-        }
-        button, img {
-            margin-top: 30px;
-            cursor: pointer;
-            border: none;
-            background: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>ניסוי זיכרון - לוטם</title>
+
+  <!-- ✅ גרסה שמתאימה לדפדפן -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+  <!-- ✅ עיצוב -->
+  <style>
+    body {
+      font-family: 'Noto Sans Hebrew', 'Calibri', sans-serif;
+      background-color: #f2f2f2;
+      color: #222;
+      text-align: center;
+      font-size: 28px;
+      direction: rtl;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    input {
+      font-family: inherit;
+      font-size: 24px;
+      text-align: center;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      width: 200px;
+    }
+
+    img {
+      margin-top: 30px;
+      width: 100px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    img:hover {
+      transform: scale(1.05);
+    }
+
+    #word, #plus, #instructions, #participant-screen {
+      display: none;
+    }
+
+    #plus {
+      font-size: 50px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 24px;
+    }
+
+    #message {
+      color: #b30000;
+      font-size: 22px;
+    }
+  </style>
 </head>
+
 <body>
 
-    <!-- שלב 1: הכנסת מזהה משתתף -->
-    <div id="participant-screen">
-        <h2>אנא הזיני את מספר המשתתף שלך:</h2>
-        <input type="text" id="participantID" placeholder="לדוגמה: 101" style="font-size:24px; text-align:center;">
-        <br><br>
-        <button onclick="checkParticipant()" style="font-size:24px;">התחל ניסוי</button>
-        <p id="message"></p>
-    </div>
+  <!-- שלב 1: הכנסת מזהה משתתף -->
+  <div id="participant-screen">
+    <h2>אנא הזיני את מספר המשתתף שלך:</h2>
+    <input type="text" id="participantID" placeholder="לדוגמה: 101">
+    <br><br>
+    <img src="MoveForward.png" alt="התחל ניסוי" onclick="checkParticipant()">
+    <p id="message"></p>
+  </div>
 
-    <!-- שלב 2: הוראות -->
-    <div id="instructions">
-        <h2>הוראות הניסוי</h2>
-        <p>תוצג בפנייך סדרת מילים. עלייך להתבונן היטב בכל מילה.<br>
-           כל מילה תופיע לשתי שניות, ובין המילים יופיע סימן “+”.</p>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Button_Icon_Blue.svg" width="100" onclick="startExperiment()" alt="המשך">
-    </div>
+  <!-- שלב 2: הוראות -->
+  <div id="instructions">
+    <h2>הוראות הניסוי</h2>
+    <p>
+      תוצג בפנייך סדרת מילים.<br>
+      עלייך להתבונן היטב בכל מילה.<br>
+      כל מילה תופיע לשתי שניות, ובין המילים יופיע סימן “+”.
+    </p>
+    <img src="MoveForward.png" alt="המשך" onclick="startExperiment()">
+  </div>
 
-    <!-- שלב 3: הצגת מילים -->
-    <div id="word"></div>
-    <div id="plus">+</div>
+  <!-- שלב 3: הצגת מילים -->
+  <div id="word"></div>
+  <div id="plus">+</div>
 
-<script>
+  <script>
     // --- הגדרת Firebase ---
     const firebaseConfig = {
         apiKey: "AIzaSyDkn5w4p3d5_o-15oMlcHwUBtf2EhuwYBY",
@@ -59,10 +106,10 @@
         appId: "1:439424740663:web:dd372b3a8cef4ed98cbeb2"
     };
 
-    const app = firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // מילים להצגה
+    // רשימת מילים
     const words = [
         "אחת","שתיים","שלוש","ארבע","חמש","שש","שבע","שמונה","תשע","עשר",
         "אחתעשרה","שתייםעשרה","שלושעשרה","ארבעעשרה","חמשעשרה","ששעשרה","שבעעשרה","שמונהעשרה","תשעעשרה","עשרים",
@@ -70,7 +117,7 @@
         "שלושיםואחת","שלושיםושתיים","שלושיםושלוש","שלושיםוארבע","שלושיםוחמש","שלושיםושש","שלושיםושבע","שלושיםושמונה","שלושיםותשע","ארבעים"
     ];
 
-    // ערבוב רנדומלי של המילים
+    // ערבוב
     function shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -82,10 +129,13 @@
     // הצגת מסך ראשון
     document.getElementById("participant-screen").style.display = "block";
 
+    // בדיקת משתתף
     async function checkParticipant() {
         const id = document.getElementById("participantID").value.trim();
+        const message = document.getElementById("message");
+
         if (!id) {
-            document.getElementById("message").innerText = "יש להזין מספר משתתף.";
+            message.innerText = "יש להזין מספר משתתף.";
             return;
         }
 
@@ -93,7 +143,7 @@
         const docSnap = await ref.get();
 
         if (docSnap.exists) {
-            document.getElementById("message").innerText = "נראה שכבר השתתפת בניסוי. תודה!";
+            message.innerText = "נראה שכבר השתתפת בניסוי. תודה!";
         } else {
             await ref.set({ entered: true, timestamp: new Date() });
             document.getElementById("participant-screen").style.display = "none";
@@ -101,6 +151,7 @@
         }
     }
 
+    // תחילת הניסוי
     async function startExperiment() {
         document.getElementById("instructions").style.display = "none";
         const randomizedWords = shuffle([...words]);
@@ -108,17 +159,16 @@
         document.body.innerHTML = "<h2>תודה! סיום שלב הקידוד.</h2>";
     }
 
+    // הצגת מילים
     async function showWords(wordList) {
         const wordDiv = document.getElementById("word");
         const plusDiv = document.getElementById("plus");
 
         for (const w of wordList) {
-            // הצג +
             plusDiv.style.display = "block";
             wordDiv.style.display = "none";
             await new Promise(r => setTimeout(r, 1000));
 
-            // הצג מילה
             plusDiv.style.display = "none";
             wordDiv.innerText = w;
             wordDiv.style.display = "block";
@@ -128,8 +178,6 @@
         wordDiv.style.display = "none";
         plusDiv.style.display = "none";
     }
-</script>
-
+  </script>
 </body>
 </html>
-
