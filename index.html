@@ -257,13 +257,25 @@
 			} else if (stim.type === "rabbit") {
 				rabbitActive = true;
 				rabbitImg.style.display = "block";
-				await new Promise(r => setTimeout(r, 4000));
 				
-				if (rabbitActive) {
-					rabbitMisses++;
-					rabbitActive = false;
-				}
+				// ✅ יצירת פרומיס חדש שנפתר אם נלחץ רווח או חלפו 4 שניות
+				await new Promise(resolve => {
+					const timeout = setTimeout(() => {
+						if (rabbitActive) rabbitMisses++;
+						rabbitActive = false;
+						resolve();
+					}, 4000);
 					
+				const handler = (e) => {
+					if (e.code === "Space" && rabbitActive) {
+						rabbitHits++;
+						rabbitActive = false;
+                        clearTimeout(timeout);
+                        document.removeEventListener("keydown", handler);
+                        resolve(); // עובר לגירוי הבא מיד
+					}
+				};	
+				
 				rabbitImg.style.display = "none";
 			}
         }
