@@ -261,6 +261,7 @@
 
 				// Promise שנפתר אם נלחץ רווח או חלפו 4 שניות
 				await new Promise((resolve) => {
+					let timeout;
 					// Handler למקש רווח
 					const handler = (e) => {
 						if (e.code === "Space" && rabbitActive) {
@@ -275,7 +276,7 @@
 					document.addEventListener("keydown", handler);
 
 					// Timeout רגיל
-					const timeout = setTimeout(() => {
+					timeout = setTimeout(() => {
 						if (rabbitActive) rabbitMisses++;
 						rabbitActive = false;
 						document.removeEventListener("keydown", handler);
