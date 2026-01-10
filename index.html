@@ -259,13 +259,12 @@
 				rabbitImg.style.display = "block";
 				await new Promise(r => setTimeout(r, 4000));
 				
-					if (rabbitActive) {
-						rabbitMisses++;
-						rabbitActive = false;
-					}
-					
-					rabbitImg.style.display = "none";
+				if (rabbitActive) {
+					rabbitMisses++;
+					rabbitActive = false;
 				}
+					
+				rabbitImg.style.display = "none";
 			}
         }
     }
