@@ -101,6 +101,7 @@
   <!-- שלב 3: הצגת מילים -->
   <div id="word"></div>
   <div id="plus">+</div>
+  <img id="rabbit" src="rabbit.png" style="display:none; width:200px;">
 
   <script>
     // --- הגדרת Firebase ---
@@ -115,6 +116,19 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+	// משתנה גלובלי למזהה משתתף
+    let currentParticipantID = null;
+	// משתנים לבקרת קשב (ארנבים)
+	let rabbitHits = 0;
+	let rabbitMisses = 0;
+	let rabbitActive = false;
+	// האזנה למקש רווח עבור הארנב
+	document.addEventListener("keydown", (e) => {
+		if (e.code === "Space" && rabbitActive) {
+			rabbitHits++;
+			rabbitActive = false;
+		}
+	});
 
     // רשימת מילים
     const words = [
@@ -132,6 +146,30 @@
         }
         return array;
     }
+	
+	function buildStimulusSequence(words) {
+		const sequence = words.map(w => ({ type: "word", value: w }));
+		const rabbitPositions = [];
+
+		while (rabbitPositions.length < 3) {
+			const pos = Math.floor(Math.random() * (sequence.length - 2)) + 1;
+
+			if (
+				!rabbitPositions.includes(pos) &&
+				!rabbitPositions.includes(pos - 1) &&
+				!rabbitPositions.includes(pos + 1)
+			) {
+            rabbitPositions.push(pos);
+			}
+		}
+
+		rabbitPositions.forEach(pos => {
+			sequence.splice(pos, 0, { type: "rabbit" });
+		});
+
+		return sequence;
+	}
+
 
     // הצגת מסך ראשון
     document.getElementById("participant-screen").style.display = "block";
@@ -139,6 +177,7 @@
     // בדיקת משתתף
     async function checkParticipant() {
         const id = document.getElementById("participantID").value.trim();
+		currentParticipantID = id;
         const message = document.getElementById("message");
 
         if (!id) {
@@ -167,7 +206,25 @@
 
         document.getElementById("instructions").style.display = "none";
         const randomizedWords = shuffle([...words]);
-        await showWords(randomizedWords);
+		const stimuli = buildStimulusSequence(randomizedWords);
+		await showStimuli(stimuli);
+		
+		// 🧩 שלב 5: בדיקת מבחן הארנבים
+		const totalRabbits = rabbitHits + rabbitMisses;
+		
+		// כלל החלטה (אפשר לשנות):
+		// לדוגמה: חייבים ללחוץ על לפחות 2 מתוך 3
+		const passedRabbitTest = rabbitHits >= 2;
+		
+		
+		// שמירה ב-Firebase
+		await db.collection("participants")
+			.doc(currentParticipantID)
+			.update({
+				rabbitHits: rabbitHits,
+				rabbitMisses: rabbitMisses,
+				passedRabbitTest: passedRabbitTest
+			});
 
         // ✅ טקסט סיום חדש בשלוש שורות
         document.body.innerHTML = `
@@ -177,24 +234,40 @@
         `;
     }
 
-    // הצגת מילים
-    async function showWords(wordList) {
+    // הצגת גירויים
+    async function showStimuli(stimuli) {
         const wordDiv = document.getElementById("word");
-        const plusDiv = document.getElementById("plus");
+		const plusDiv = document.getElementById("plus");
+		const rabbitImg = document.getElementById("rabbit");
 
-        for (const w of wordList) {
+        for (const stim of stimuli) {
             plusDiv.style.display = "block";
-            wordDiv.style.display = "none";
-            await new Promise(r => setTimeout(r, 1000));
-
-            plusDiv.style.display = "none";
-            wordDiv.innerText = w;
-            wordDiv.style.display = "block";
-            await new Promise(r => setTimeout(r, 2000));
+			wordDiv.style.display = "none";
+			rabbitImg.style.display = "none";
+			await new Promise(r => setTimeout(r, 1000));
+			
+			plusDiv.style.display = "none";
+			
+			if (stim.type === "word") {
+				wordDiv.innerText = stim.value;
+				wordDiv.style.display = "block";
+				await new Promise(r => setTimeout(r, 2000));
+				wordDiv.style.display = "none";
+			
+			} else if (stim.type === "rabbit") {
+				rabbitActive = true;
+				rabbitImg.style.display = "block";
+				await new Promise(r => setTimeout(r, 4000));
+				
+					if (rabbitActive) {
+						rabbitMisses++;
+						rabbitActive = false;
+					}
+					
+					rabbitImg.style.display = "none";
+				}
+			}
         }
-
-        wordDiv.style.display = "none";
-        plusDiv.style.display = "none";
     }
   </script>
 </body>
