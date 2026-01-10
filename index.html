@@ -259,10 +259,11 @@
 				rabbitImg.style.display = "block";
 				
 				// ✅ יצירת פרומיס חדש שנפתר אם נלחץ רווח או חלפו 4 שניות
-				await new Promise(resolve => {
+				await new Promise((resolve) => {
 					const timeout = setTimeout(() => {
 						if (rabbitActive) rabbitMisses++;
 						rabbitActive = false;
+						document.removeEventListener("keydown", handler);
 						resolve();
 					}, 4000);
 					
