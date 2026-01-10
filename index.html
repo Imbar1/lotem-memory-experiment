@@ -235,52 +235,58 @@
     }
 
     // הצגת גירויים
-    async function showStimuli(stimuli) {
-        const wordDiv = document.getElementById("word");
+	async function showStimuli(stimuli) {
+		const wordDiv = document.getElementById("word");
 		const plusDiv = document.getElementById("plus");
 		const rabbitImg = document.getElementById("rabbit");
 
-        for (const stim of stimuli) {
-            plusDiv.style.display = "block";
+		for (const stim of stimuli) {
+			// הצגת "+"
+			plusDiv.style.display = "block";
 			wordDiv.style.display = "none";
 			rabbitImg.style.display = "none";
 			await new Promise(r => setTimeout(r, 1000));
-			
+        
 			plusDiv.style.display = "none";
-			
+
 			if (stim.type === "word") {
 				wordDiv.innerText = stim.value;
 				wordDiv.style.display = "block";
 				await new Promise(r => setTimeout(r, 2000));
 				wordDiv.style.display = "none";
-			
+
 			} else if (stim.type === "rabbit") {
 				rabbitActive = true;
 				rabbitImg.style.display = "block";
-				
-				// ✅ יצירת פרומיס חדש שנפתר אם נלחץ רווח או חלפו 4 שניות
+
+				// Promise שנפתר אם נלחץ רווח או חלפו 4 שניות
 				await new Promise((resolve) => {
+					// Handler למקש רווח
+					const handler = (e) => {
+						if (e.code === "Space" && rabbitActive) {
+							rabbitHits++;
+							rabbitActive = false;
+							clearTimeout(timeout);
+							document.removeEventListener("keydown", handler);
+							resolve(); // עובר לגירוי הבא מיד
+						}
+					};
+
+					document.addEventListener("keydown", handler);
+
+					// Timeout רגיל
 					const timeout = setTimeout(() => {
 						if (rabbitActive) rabbitMisses++;
 						rabbitActive = false;
 						document.removeEventListener("keydown", handler);
 						resolve();
 					}, 4000);
-					
-				const handler = (e) => {
-					if (e.code === "Space" && rabbitActive) {
-						rabbitHits++;
-						rabbitActive = false;
-                        clearTimeout(timeout);
-                        document.removeEventListener("keydown", handler);
-                        resolve(); // עובר לגירוי הבא מיד
-					}
-				};	
-				
-				rabbitImg.style.display = "none";
+				});
+
+				rabbitImg.style.display = "none"; // מוסתר אחרי שה־await הסתיים
 			}
-        }
-    }
+		}
+	}
   </script>
 </body>
 </html>
