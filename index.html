@@ -93,7 +93,8 @@
     <p>
       תוצג בפנייך סדרת מילים.<br>
       עלייך להתבונן היטב בכל מילה.<br>
-      כל מילה תופיע לשתי שניות, ובין המילים יופיע סימן “+”.
+      כל מילה תופיע לשתי שניות, ובין המילים יופיע סימן “+”.<br>
+	  במהלך המשימה, יופיע כמה פעמים ארנב. כל פעם שהוא מופיע יש ללחוץ על מקש "רווח"
     </p>
     <img src="MoveForward.png" alt="המשך" onclick="startExperiment()">
   </div>
@@ -122,13 +123,6 @@
 	let rabbitHits = 0;
 	let rabbitMisses = 0;
 	let rabbitActive = false;
-	// האזנה למקש רווח עבור הארנב
-	document.addEventListener("keydown", (e) => {
-		if (e.code === "Space" && rabbitActive) {
-			rabbitHits++;
-			rabbitActive = false;
-		}
-	});
 
     // רשימת מילים
     const words = [
@@ -265,6 +259,7 @@
 					// Handler למקש רווח
 					const handler = (e) => {
 						if (e.code === "Space" && rabbitActive) {
+							console.log("space pressed!");
 							rabbitHits++;
 							rabbitActive = false;
 							clearTimeout(timeout);
